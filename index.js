@@ -1,5 +1,4 @@
 // JavaScript source code
-// JavaScript source code
 var drawing = false;
 // 前回の座標を記録
 var before_x = 0;
@@ -48,13 +47,57 @@ canvas.addEventListener('mouseup', function () {
     drawing = false;
 });
 
+// 描画の処理
+function draw_canvas(e) {
+    if (!drawing) {
+        return
+    };
+    var rect = e.target.getBoundingClientRect();
+    var x = e.clientX - rect.left;
+    var y = e.clientY - rect.top;
+    var w = document.getElementById('width').value;
+    var color = document.getElementById('color').value;
+    var r = parseInt(color.substring(1, 3), 16);
+    var g = parseInt(color.substring(3, 5), 16);
+    var b = parseInt(color.substring(5, 7), 16);
+    // 描画
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = 'rgb(' + r + ',' + g + ',' + b + ')';
+    ctx.lineWidth = w;
+    ctx.beginPath();
+    ctx.moveTo(before_x, before_y);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    ctx.closePath();
+    // 描画最後の座標を前回の座標に代入する
+    before_x = x;
+    before_y = y;
+}
+
+var pen = document.getElementById('pencil');
+var era = document.getElementById('eraser');
+
+// 鉛筆と消しゴムの切り替え
+function tool(btnNum) {
+    // クリックされボタンが鉛筆だったら
+    if (btnNum == 1) {
+        ctx.globalCompositeOperation = 'source-over';
+        pen.className = 'active';
+        era.className = '';
+    }
+    // クリックされボタンが消しゴムだったら
+    else if (btnNum == 2) {
+        ctx.globalCompositeOperation = 'destination-out';
+        pen.className = '';
+        era.className = 'active';
+    }
+}
 
 
 window.addEventListener('load', function () {
 
     canvas.width = document.documentElement.clientWidth - 100;
     canvas.height = document.documentElement.clientHeight - 80;
-
 
     //背景色
     ctx.fillStyle = "white";
@@ -162,52 +205,6 @@ window.addEventListener('load', function () {
         a.href = dataUrl;
         a.download = fileName;
         a.dispatchEvent(event);
-    }
-
-    // 描画の処理
-    function draw_canvas(e) {
-        if (!drawing) {
-            return
-        };
-        var rect = e.target.getBoundingClientRect();
-        var x = e.clientX - rect.left;
-        var y = e.clientY - rect.top;
-        var w = document.getElementById('width').value;
-        var color = document.getElementById('color').value;
-        var r = parseInt(color.substring(1, 3), 16);
-        var g = parseInt(color.substring(3, 5), 16);
-        var b = parseInt(color.substring(5, 7), 16);
-        // 描画
-        ctx.lineCap = 'round';
-        ctx.strokeStyle = 'rgb(' + r + ',' + g + ',' + b + ')';
-        ctx.lineWidth = w;
-        ctx.beginPath();
-        ctx.moveTo(before_x, before_y);
-        ctx.lineTo(x, y);
-        ctx.stroke();
-        ctx.closePath();
-        // 描画最後の座標を前回の座標に代入する
-        before_x = x;
-        before_y = y;
-    }
-
-    var pen = document.getElementById('pencil');
-    var era = document.getElementById('eraser');
-
-    // 鉛筆と消しゴムの切り替え
-    function tool(btnNum) {
-        // クリックされボタンが鉛筆だったら
-        if (btnNum == 1) {
-            ctx.globalCompositeOperation = 'source-over';
-            pen.className = 'active';
-            era.className = '';
-        }
-        // クリックされボタンが消しゴムだったら
-        else if (btnNum == 2) {
-            ctx.globalCompositeOperation = 'destination-out';
-            pen.className = '';
-            era.className = 'active';
-        }
     }
 
 });
